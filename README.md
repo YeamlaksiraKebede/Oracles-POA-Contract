@@ -52,8 +52,8 @@ These contracts are for storing and managing data for the Oracles POA Network Go
 ## Compiling Oracles Contract
 
 1. Install [dapp cli](http://dapp.readthedocs.io/en/latest/installation.html#installing-dapp)
-2. Clone the repository: `git clone https://github.com/oraclesorg/oracles-contract`
-3. Navigate to the project folder: `cd oracles-contract/`
+2. Clone the repository: `git clone https://github.com/YeamlaksiraKebede/oracles-POA-contract.git`
+3. Navigate to the project folder: `cd oracles-POA-contract/`
 4. Get submodule data: `git submodule update --init --recursive`
 5. Compile the contracts: `dapp build`
 
