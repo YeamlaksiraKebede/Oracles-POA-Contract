@@ -1,10 +1,10 @@
-pragma solidity 0.4.18;
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.18;
 
 import "./Owned.sol";
 import "./ValidatorsStorage.sol";
 import "./KeysStorage.sol";
 import "./KeysManager.sol";
-
 
 contract ValidatorsManager is Owned {
     ValidatorsStorage public validatorsStorage;
@@ -67,9 +67,22 @@ contract ValidatorsManager is Owned {
     ) public {
         assert(keysStorage.checkInitialKey(msg.sender));
         assert(!validatorsStorage.isMiningKeyDataExists(miningKey));
-        assert(keysStorage.initialKeysInvalidated() < keysManager.initialKeysLimit());
+        assert(
+            keysStorage.initialKeysInvalidated() <
+                keysManager.initialKeysLimit()
+        );
 
-        validatorsStorage.setValidator(miningKey, fullName, streetName, state, zip, licenseID, licenseExpiredAt, 0, "");
+        validatorsStorage.setValidator(
+            miningKey,
+            fullName,
+            streetName,
+            state,
+            zip,
+            licenseID,
+            licenseExpiredAt,
+            0,
+            ""
+        );
     }
 
     /**
@@ -92,14 +105,26 @@ contract ValidatorsManager is Owned {
         string state
     ) public {
         assert(keysStorage.checkVotingKeyValidity(msg.sender));
-        uint licensesIssuedFromGovernance = keysStorage.getLicensesIssuedFromGovernance();
-        uint licensesLimitFromGovernance = keysManager.getLicensesLimitFromGovernance();
+        uint licensesIssuedFromGovernance = keysStorage
+            .getLicensesIssuedFromGovernance();
+        uint licensesLimitFromGovernance = keysManager
+            .getLicensesLimitFromGovernance();
         if (keysStorage.votingMiningKeysPair(msg.sender) != miningKey) {
             assert(!validatorsStorage.isMiningKeyDataExists(miningKey));
             assert(licensesIssuedFromGovernance < licensesLimitFromGovernance);
         } else {
             assert(validatorsStorage.isMiningKeyDataExists(miningKey));
         }
-        validatorsStorage.setValidator(miningKey, fullName, streetName, state, zip, licenseID, licenseExpiredAt, 0, "");
+        validatorsStorage.setValidator(
+            miningKey,
+            fullName,
+            streetName,
+            state,
+            zip,
+            licenseID,
+            licenseExpiredAt,
+            0,
+            ""
+        );
     }
 }

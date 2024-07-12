@@ -1,16 +1,16 @@
 require('chai')
-  .use(require('chai-as-promised'))
-  .use(require('chai-bignumber')(web3.BigNumber))
-  .should();
+    .use(require('chai-as-promised'))
+    .use(require('chai-bignumber')(web3.BigNumber))
+    .should();
 let data = require('./data.js');
 let big = require('./util/bigNum.js').big;
-let {addressFromNumber} = require('./util/ether.js');
+let { addressFromNumber } = require('./util/ether.js');
 let util = require('util');
 let ValidatorsManagerProxy = artifacts.require('ValidatorsManagerProxy');
 
-let {deployTestContracts} = require('./util/deploy.js');
+let { deployTestContracts } = require('./util/deploy.js');
 
-contract('ValidatorsManager', function(accounts) {
+contract('ValidatorsManager', function (accounts) {
     let {
         systemOwner,
         keysStorage,
@@ -53,12 +53,12 @@ contract('ValidatorsManager', function(accounts) {
             keysManager,
             validatorsStorage,
             validatorsManager
-            }  = await deployTestContracts()
+        } = await deployTestContracts()
         );
     });
 
     it('upsertValidatorFromGovernance [update own data with voting key]', async () => {
-        await keysStorage.addInitialKey(accounts[0], {from: systemOwner});
+        await keysStorage.addInitialKey(accounts[0], { from: systemOwner });
         await validatorsManager.insertValidatorFromCeremony(
             keys1.mining,
             data1.zip,
@@ -67,9 +67,9 @@ contract('ValidatorsManager', function(accounts) {
             data1.fullName,
             data1.streetName,
             data1.state,
-            {from: accounts[0]}
+            { from: accounts[0] }
         );
-        await keysStorage.createKeys(keys1.mining, keys1.payout, keys1.voting, {from: accounts[0]});
+        await keysStorage.createKeys(keys1.mining, keys1.payout, keys1.voting, { from: accounts[0] });
         await validatorsManager.upsertValidatorFromGovernance(
             keys1.mining,
             data1.zip,
@@ -78,7 +78,7 @@ contract('ValidatorsManager', function(accounts) {
             data1.fullName,
             'NEW STREET',
             data1.state,
-            {from: keys1.voting}
+            { from: keys1.voting }
         );
         [
             data1.fullName, 'NEW STREET', data1.state, big(data1.zip),
@@ -90,7 +90,7 @@ contract('ValidatorsManager', function(accounts) {
     });
 
     it('insertValidatorFromCeremony [add data with initial key]', async () => {
-        await keysStorage.addInitialKey(accounts[0], {from: systemOwner});
+        await keysStorage.addInitialKey(accounts[0], { from: systemOwner });
         "".should.be.equal(
             (await validatorsStorage.validator(keys1.mining))[0]
         );
@@ -102,7 +102,7 @@ contract('ValidatorsManager', function(accounts) {
             data1.fullName,
             data1.streetName,
             data1.state,
-            {from: accounts[0]}
+            { from: accounts[0] }
         );
         [
             data1.fullName, data1.streetName, data1.state, big(data1.zip),
@@ -113,7 +113,7 @@ contract('ValidatorsManager', function(accounts) {
     });
 
     it('insertValidatorFromCeremony [fails to rewrite existing data with initial key]', async () => {
-        await keysStorage.addInitialKey(accounts[0], {from: systemOwner});
+        await keysStorage.addInitialKey(accounts[0], { from: systemOwner });
         await validatorsManager.insertValidatorFromCeremony(
             keys1.mining,
             data1.zip,
@@ -122,23 +122,23 @@ contract('ValidatorsManager', function(accounts) {
             data1.fullName,
             data1.streetName,
             data1.state,
-            {from: accounts[0]}
+            { from: accounts[0] }
         );
-        await keysStorage.addInitialKey(accounts[4], {from: systemOwner});
+        await keysStorage.addInitialKey(accounts[4], { from: systemOwner });
         await validatorsManager.insertValidatorFromCeremony(
-                keys1.mining,
-                data1.zip,
-                data1.licenseExpiredAt,
-                data1.licenseID,
-                data1.fullName,
-                data1.streetName,
-                data1.state,
-                {from: accounts[4]}
-            ).should.be.rejectedWith('invalid opcode');
+            keys1.mining,
+            data1.zip,
+            data1.licenseExpiredAt,
+            data1.licenseID,
+            data1.fullName,
+            data1.streetName,
+            data1.state,
+            { from: accounts[4] }
+        ).should.be.rejectedWith('invalid opcode');
     });
 
     it('upsertValidatorFromGovernance [add new data with voting key]', async () => {
-        await keysStorage.addInitialKey(accounts[0], {from: systemOwner});
+        await keysStorage.addInitialKey(accounts[0], { from: systemOwner });
         await validatorsManager.insertValidatorFromCeremony(
             keys1.mining,
             data1.zip,
@@ -147,9 +147,9 @@ contract('ValidatorsManager', function(accounts) {
             data1.fullName,
             data1.streetName,
             data1.state,
-            {from: accounts[0]}
+            { from: accounts[0] }
         );
-        await keysStorage.createKeys(keys1.mining, keys1.payout, keys1.voting, {from: accounts[0]});
+        await keysStorage.createKeys(keys1.mining, keys1.payout, keys1.voting, { from: accounts[0] });
         await validatorsManager.upsertValidatorFromGovernance(
             keys2.mining,
             data2.zip,
@@ -158,7 +158,7 @@ contract('ValidatorsManager', function(accounts) {
             data2.fullName,
             data2.streetName,
             data2.state,
-            {from: keys1.voting}
+            { from: keys1.voting }
         );
         [
             data2.fullName, data2.streetName, data2.state, big(data2.zip),
@@ -172,31 +172,31 @@ contract('ValidatorsManager', function(accounts) {
     it('setValidatorsStorage', async () => {
         let validatorsManager = await ValidatorsManagerProxy.new();
         await validatorsManager.setValidatorsStorage(
-            validatorsStorage.address, {from: systemOwner}
+            validatorsStorage.address, { from: systemOwner }
         );
         await validatorsManager.setValidatorsStorage(
-                validatorsStorage.address, {from: systemOwner}
-            ).should.be.rejectedWith(': revert');
+            validatorsStorage.address, { from: systemOwner }
+        ).should.be.rejectedWith(': revert');
     });
 
     it('setKeysStorage', async () => {
         let validatorsManager = await ValidatorsManagerProxy.new();
         await validatorsManager.setKeysStorage(
-            keysStorage.address, {from: systemOwner}
+            keysStorage.address, { from: systemOwner }
         );
         await validatorsManager.setKeysStorage(
-                keysStorage.address, {from: systemOwner}
-            ).should.be.rejectedWith(': revert');
+            keysStorage.address, { from: systemOwner }
+        ).should.be.rejectedWith(': revert');
     });
 
     it('setKeysManager', async () => {
         let validatorsManager = await ValidatorsManagerProxy.new();
         await validatorsManager.setKeysManager(
-            keysManager.address, {from: systemOwner}
+            keysManager.address, { from: systemOwner }
         );
         await validatorsManager.setKeysManager(
-                keysManager.address, {from: systemOwner}
-            ).should.be.rejectedWith(': revert');
+            keysManager.address, { from: systemOwner }
+        ).should.be.rejectedWith(': revert');
     });
 
 });

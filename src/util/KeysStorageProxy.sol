@@ -1,7 +1,7 @@
-pragma solidity 0.4.18;
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.18;
 
 import "./../KeysStorage.sol";
-
 
 contract KeysStorageProxy is KeysStorage {
     function KeysStorageProxy() public KeysStorage() {
@@ -23,5 +23,4 @@ contract KeysStorageProxy is KeysStorage {
     function callSetValidatorsManager(address addr) public {
         setValidatorsManager(addr);
     }
-
 }

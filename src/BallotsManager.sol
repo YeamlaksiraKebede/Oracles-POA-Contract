@@ -1,11 +1,11 @@
-pragma solidity 0.4.18;
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.18;
 
 import "./Owned.sol";
 import "./BallotsStorage.sol";
 import "./KeysStorage.sol";
 import "./KeysManager.sol";
 import "./ValidatorsStorage.sol";
-
 
 contract BallotsManager is Owned {
     uint public votingLowerLimit = 3;
@@ -15,7 +15,12 @@ contract BallotsManager is Owned {
     KeysManager public keysManager;
     ValidatorsStorage public validatorsStorage;
 
-    function initialize(address ballotsStorageAddr, address keysStorageAddr, address keysManagerAddr, address validatorsStorageAddr) public onlyOwner {
+    function initialize(
+        address ballotsStorageAddr,
+        address keysStorageAddr,
+        address keysManagerAddr,
+        address validatorsStorageAddr
+    ) public onlyOwner {
         require(msg.sender == BallotsStorage(ballotsStorageAddr).owner());
         require(msg.sender == ValidatorsStorage(validatorsStorageAddr).owner());
         require(msg.sender == KeysStorage(keysStorageAddr).owner());
@@ -70,31 +75,67 @@ contract BallotsManager is Owned {
         string memo
     ) public {
         assert(keysStorage.checkVotingKeyValidity(msg.sender));
-        assert(!(keysStorage.getLicensesIssuedFromGovernance() == keysManager.getLicensesLimitFromGovernance() && addAction));
+        assert(
+            !(keysStorage.getLicensesIssuedFromGovernance() ==
+                keysManager.getLicensesLimitFromGovernance() &&
+                addAction)
+        );
         assert(ballotsStorage.ballotCreatedAt(ballotID) <= 0);
-        if (affectedKeyType == 0) {//mining key
+        if (affectedKeyType == 0) {
+            //mining key
             bool validatorIsAdded = false;
             uint validatorLength = validatorsStorage.getValidatorsLength();
             for (uint i = 0; i < validatorLength; i++) {
-                assert(!(validatorsStorage.getValidatorAtPosition(i) == affectedKey && addAction)); //validator is already added before
-                if (validatorsStorage.getValidatorAtPosition(i) == affectedKey) {
+                assert(
+                    !(validatorsStorage.getValidatorAtPosition(i) ==
+                        affectedKey &&
+                        addAction)
+                ); //validator is already added before
+                if (
+                    validatorsStorage.getValidatorAtPosition(i) == affectedKey
+                ) {
                     validatorIsAdded = true;
                     break;
                 }
             }
-            uint disabledValidatorsLength = validatorsStorage.getDisabledValidatorsLength();
+            uint disabledValidatorsLength = validatorsStorage
+                .getDisabledValidatorsLength();
             for (uint j = 0; j < disabledValidatorsLength; j++) {
-                assert(validatorsStorage.getDisabledValidatorAtPosition(j) != affectedKey); //validator is already removed before
+                assert(
+                    validatorsStorage.getDisabledValidatorAtPosition(j) !=
+                        affectedKey
+                ); //validator is already removed before
             }
             assert(!(!validatorIsAdded && !addAction)); // no such validator in validators array to remove it
-        } else if (affectedKeyType == 1) {//voting key
-            assert(!(keysStorage.checkVotingKeyValidity(affectedKey) && addAction)); //voting key is already added before
-            assert(!(!keysStorage.checkVotingKeyValidity(affectedKey) && !addAction)); //no such voting key to remove it
-        } else if (affectedKeyType == 2) {//payout key
-            assert(!(keysStorage.checkPayoutKeyValidity(affectedKey) && addAction)); //payout key is already added before
-            assert(!(!keysStorage.checkPayoutKeyValidity(affectedKey) && !addAction)); //no such payout key to remove it
+        } else if (affectedKeyType == 1) {
+            //voting key
+            assert(
+                !(keysStorage.checkVotingKeyValidity(affectedKey) && addAction)
+            ); //voting key is already added before
+            assert(
+                !(!keysStorage.checkVotingKeyValidity(affectedKey) &&
+                    !addAction)
+            ); //no such voting key to remove it
+        } else if (affectedKeyType == 2) {
+            //payout key
+            assert(
+                !(keysStorage.checkPayoutKeyValidity(affectedKey) && addAction)
+            ); //payout key is already added before
+            assert(
+                !(!keysStorage.checkPayoutKeyValidity(affectedKey) &&
+                    !addAction)
+            ); //no such payout key to remove it
         }
-        ballotsStorage.addBallotInternal(ballotID, owner, miningKey, affectedKey, affectedKeyType, duration, addAction, memo);
+        ballotsStorage.addBallotInternal(
+            ballotID,
+            owner,
+            miningKey,
+            affectedKey,
+            affectedKeyType,
+            duration,
+            addAction,
+            memo
+        );
     }
 
     /**
@@ -125,19 +166,26 @@ contract BallotsManager is Owned {
         require(msg.sender == address(ballotsStorage));
         address affectedKey = ballotsStorage.getBallotAffectedKey(ballotID);
         address miningKey = ballotsStorage.getBallotMiningKey(ballotID);
-        uint affectedKeyType = ballotsStorage.getBallotAffectedKeyType(ballotID);
-        uint licensesIssuedFromGovernance = keysStorage.getLicensesIssuedFromGovernance();
-        uint licensesLimitFromGovernance = keysManager.getLicensesLimitFromGovernance();
-        if (affectedKeyType == 0) {//mining key
+        uint affectedKeyType = ballotsStorage.getBallotAffectedKeyType(
+            ballotID
+        );
+        uint licensesIssuedFromGovernance = keysStorage
+            .getLicensesIssuedFromGovernance();
+        uint licensesLimitFromGovernance = keysManager
+            .getLicensesLimitFromGovernance();
+        if (affectedKeyType == 0) {
+            //mining key
             if (licensesIssuedFromGovernance < licensesLimitFromGovernance) {
                 keysStorage.increaseLicenses();
                 validatorsStorage.addValidator(affectedKey);
             }
-        } else if (affectedKeyType == 1) {//voting key
+        } else if (affectedKeyType == 1) {
+            //voting key
             keysStorage.setVotingKey(affectedKey, true);
             keysStorage.setVotingMiningKeysPair(affectedKey, miningKey);
             keysStorage.setMiningVotingKeysPair(miningKey, affectedKey);
-        } else if (affectedKeyType == 2) {//payout key
+        } else if (affectedKeyType == 2) {
+            //payout key
             keysStorage.setPayoutKey(affectedKey, true);
             keysStorage.setMiningPayoutKeysPair(miningKey, affectedKey);
         }
@@ -147,21 +195,28 @@ contract BallotsManager is Owned {
         require(msg.sender == address(ballotsStorage));
         address affectedKey = ballotsStorage.getBallotAffectedKey(ballotID);
         address miningKey = ballotsStorage.getBallotMiningKey(ballotID);
-        uint affectedKeyType = ballotsStorage.getBallotAffectedKeyType(ballotID);
-        if (affectedKeyType == 0) {//mining key
+        uint affectedKeyType = ballotsStorage.getBallotAffectedKeyType(
+            ballotID
+        );
+        if (affectedKeyType == 0) {
+            //mining key
             uint validatorLength = validatorsStorage.getValidatorsLength();
             for (uint jj = 0; jj < validatorLength; jj++) {
-                if (validatorsStorage.getValidatorAtPosition(jj) == affectedKey) {
-                    validatorsStorage.removeValidator(jj); 
+                if (
+                    validatorsStorage.getValidatorAtPosition(jj) == affectedKey
+                ) {
+                    validatorsStorage.removeValidator(jj);
                     return;
                 }
             }
             validatorsStorage.disableValidator(affectedKey);
-        } else if (affectedKeyType == 1) {//voting key
+        } else if (affectedKeyType == 1) {
+            //voting key
             keysStorage.setVotingKey(affectedKey, false);
             keysStorage.setVotingMiningKeysPair(0x0, miningKey);
             keysStorage.setMiningVotingKeysPair(miningKey, 0x0);
-        } else if (affectedKeyType == 2) {//payout key
+        } else if (affectedKeyType == 2) {
+            //payout key
             keysStorage.setPayoutKey(affectedKey, false);
             keysStorage.setMiningPayoutKeysPair(miningKey, 0x0);
         }

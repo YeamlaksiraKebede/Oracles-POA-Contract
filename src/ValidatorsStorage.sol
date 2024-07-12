@@ -1,4 +1,5 @@
-pragma solidity 0.4.18;
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.18;
 
 import "./Utility.sol";
 import "./Owned.sol";
@@ -9,7 +10,7 @@ import "./BallotsManager.sol";
 contract ValidatorsStorage is Owned, Utility {
     address[] public validators;
     address[] public disabledValidators;
-    
+
     struct Validator {
         string fullName;
         string streetName;
@@ -20,17 +21,17 @@ contract ValidatorsStorage is Owned, Utility {
         uint disablingDate;
         string disablingTX;
     }
-    
+
     mapping(address => Validator) public validator;
 
     /// Issue this log event to signal a desired change in validator set.
-    /// This will not lead to a change in active validator set until 
+    /// This will not lead to a change in active validator set until
     /// finalizeChange is called.
     ///
     /// Only the last log event of any block can take effect.
     /// If a signal is issued while another is being finalized it may never
     /// take effect.
-    /// 
+    ///
     /// _parent_hash here should be the parent block hash, or the
     /// signal will not be recognized.
     event InitiateChange(bytes32 indexed _parent_hash, address[] _new_set);
@@ -44,7 +45,11 @@ contract ValidatorsStorage is Owned, Utility {
         InitiateChange(Utility.getLastBlockHash(), validators);
     }
 
-    function initialize(address validatorsManagerAddr, address keysStorageAddr, address ballotsManagerAddr) public onlyOwner {
+    function initialize(
+        address validatorsManagerAddr,
+        address keysStorageAddr,
+        address ballotsManagerAddr
+    ) public onlyOwner {
         require(msg.sender == KeysStorage(keysStorageAddr).owner());
         require(msg.sender == BallotsManager(ballotsManagerAddr).owner());
         require(msg.sender == ValidatorsManager(validatorsManagerAddr).owner());
@@ -86,10 +91,12 @@ contract ValidatorsStorage is Owned, Utility {
         return validators.length;
     }
 
-    function getValidatorAtPosition(uint i) public view returns (address value) {
+    function getValidatorAtPosition(
+        uint i
+    ) public view returns (address value) {
         return validators[i];
     }
-    
+
     /**
     @notice Gets disabled notaries mining keys
     @return { "value" : "Array of disabled notaries mining keys" }
@@ -102,37 +109,45 @@ contract ValidatorsStorage is Owned, Utility {
         return disabledValidators.length;
     }
 
-    function getDisabledValidatorAtPosition(uint i) public view returns (address value) {
+    function getDisabledValidatorAtPosition(
+        uint i
+    ) public view returns (address value) {
         return disabledValidators[i];
     }
-    
+
     /**
     @notice Gets notary's full name
     @param addr Notary's mining key
     @return { "value" : "Notary's full name" }
     */
-    function getValidatorFullName(address addr) public view returns (string value) {
+    function getValidatorFullName(
+        address addr
+    ) public view returns (string value) {
         return validator[addr].fullName;
     }
-    
+
     /**
     @notice Gets notary's address
     @param addr Notary's mining key
     @return { "value" : "Notary's address" }
     */
-    function getValidatorStreetName(address addr) public view returns (string value) {
+    function getValidatorStreetName(
+        address addr
+    ) public view returns (string value) {
         return validator[addr].streetName;
     }
-    
+
     /**
     @notice Gets notary's state full name
     @param addr Notary's mining key
     @return { "value" : "Notary's state full name" }
     */
-    function getValidatorState(address addr) public view returns (string value) {
+    function getValidatorState(
+        address addr
+    ) public view returns (string value) {
         return validator[addr].state;
     }
-    
+
     /**
     @notice Gets notary's zip code
     @param addr Notary's mining key
@@ -141,22 +156,26 @@ contract ValidatorsStorage is Owned, Utility {
     function getValidatorZip(address addr) public view returns (uint value) {
         return validator[addr].zip;
     }
-    
+
     /**
     @notice Gets notary's license ID
     @param addr Notary's mining key
     @return { "value" : "Notary's license ID" }
     */
-    function getValidatorLicenseID(address addr) public view returns (string value) {
+    function getValidatorLicenseID(
+        address addr
+    ) public view returns (string value) {
         return validator[addr].licenseID;
     }
-    
+
     /**
     @notice Gets notary's license expiration date
     @param addr Notary's mining key
     @return { "value" : "Notary's license expiration date" }
     */
-    function getValidatorLicenseExpiredAt(address addr) public view returns (uint value) {
+    function getValidatorLicenseExpiredAt(
+        address addr
+    ) public view returns (uint value) {
         return validator[addr].licenseExpiredAt;
     }
 
@@ -165,13 +184,17 @@ contract ValidatorsStorage is Owned, Utility {
     @param addr Notary's mining key
     @return { "value" : "Notary's disabling date" }
     */
-    function getValidatorDisablingDate(address addr) public view returns (uint value) {
+    function getValidatorDisablingDate(
+        address addr
+    ) public view returns (uint value) {
         return validator[addr].disablingDate;
     }
 
     function addValidator(address addr) public {
-        require(msg.sender == address(ballotsManager) 
-        || msg.sender == address(keysStorage));
+        require(
+            msg.sender == address(ballotsManager) ||
+                msg.sender == address(keysStorage)
+        );
         validators.push(addr);
         InitiateChange(Utility.getLastBlockHash(), validators);
     }
@@ -187,14 +210,14 @@ contract ValidatorsStorage is Owned, Utility {
     @param index Element's index to remove
     @return { "value" : "Updated validators array with removed element at index" }
     */
-    function removeValidator(uint index) public returns(address[]) {
+    function removeValidator(uint index) public returns (address[]) {
         require(msg.sender == address(ballotsManager));
         if (index >= validators.length) return;
 
-        for (uint i = index; i < validators.length-1; i++) {
-            validators[i] = validators[i+1];
+        for (uint i = index; i < validators.length - 1; i++) {
+            validators[i] = validators[i + 1];
         }
-        delete validators[validators.length-1];
+        delete validators[validators.length - 1];
         validators.length--;
     }
 
@@ -211,18 +234,20 @@ contract ValidatorsStorage is Owned, Utility {
     ) public {
         require(msg.sender == address(validatorsManager));
         validator[miningKey] = Validator({
-            fullName: fullName, 
-            streetName: streetName, 
-            state: state, 
-            zip: zip, 
-            licenseID: licenseID, 
-            licenseExpiredAt: licenseExpiredAt, 
-            disablingDate: disablingDate, 
+            fullName: fullName,
+            streetName: streetName,
+            state: state,
+            zip: zip,
+            licenseID: licenseID,
+            licenseExpiredAt: licenseExpiredAt,
+            disablingDate: disablingDate,
             disablingTX: disablingTX
         });
     }
 
-    function isMiningKeyDataExists(address miningKey) public view returns (bool) {
+    function isMiningKeyDataExists(
+        address miningKey
+    ) public view returns (bool) {
         bytes memory name = bytes(validator[miningKey].fullName);
         return name.length > 0;
     }

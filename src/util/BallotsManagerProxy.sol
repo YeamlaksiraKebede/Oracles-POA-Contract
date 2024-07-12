@@ -1,7 +1,7 @@
-pragma solidity 0.4.18;
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.18;
 
 import "./../BallotsManager.sol";
-
 
 contract BallotsManagerProxy is BallotsManager {
     function BallotsManagerProxy() public BallotsManager() {
@@ -12,15 +12,24 @@ contract BallotsManagerProxy is BallotsManager {
         keysStorage.increaseLicenses();
     }
 
-    function callSetVotingMiningKeysPair(address votingKey, address miningKey) public {
+    function callSetVotingMiningKeysPair(
+        address votingKey,
+        address miningKey
+    ) public {
         keysStorage.setVotingMiningKeysPair(votingKey, miningKey);
     }
 
-    function callSetMiningVotingKeysPair(address miningKey, address votingKey) public {
+    function callSetMiningVotingKeysPair(
+        address miningKey,
+        address votingKey
+    ) public {
         keysStorage.setMiningVotingKeysPair(miningKey, votingKey);
     }
 
-    function callSetMiningPayoutKeysPair(address miningKey, address payoutKey) public {
+    function callSetMiningPayoutKeysPair(
+        address miningKey,
+        address payoutKey
+    ) public {
         keysStorage.setMiningPayoutKeysPair(miningKey, payoutKey);
     }
 
@@ -31,5 +40,4 @@ contract BallotsManagerProxy is BallotsManager {
     function callSetPayoutKey(address _payoutKey, bool _isActive) public {
         keysStorage.setPayoutKey(_payoutKey, _isActive);
     }
-
 }

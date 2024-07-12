@@ -1,12 +1,11 @@
-pragma solidity 0.4.18;
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.18;
 
 import "./Owned.sol";
 import "./BallotsManager.sol";
 import "./KeysStorage.sol";
 
-
 contract BallotsStorage is Owned {
-
     struct Ballot {
         address owner;
         address miningKey;
@@ -20,7 +19,7 @@ contract BallotsStorage is Owned {
         int result;
         bool addAction;
         bool active;
-        mapping (address => bool) voted;
+        mapping(address => bool) voted;
     }
 
     mapping(uint => Ballot) public ballotsMapping;
@@ -30,7 +29,10 @@ contract BallotsStorage is Owned {
     BallotsManager public ballotsManager;
     KeysStorage public keysStorage;
 
-    function initialize(address ballotsManagerAddr, address keysStorageAddr) public onlyOwner {
+    function initialize(
+        address ballotsManagerAddr,
+        address keysStorageAddr
+    ) public onlyOwner {
         require(msg.sender == BallotsManager(ballotsManagerAddr).owner());
         require(msg.sender == KeysStorage(keysStorageAddr).owner());
 
@@ -56,7 +58,7 @@ contract BallotsStorage is Owned {
     function getBallotAtPosition(uint i) public view returns (uint value) {
         return ballots[i];
     }
-    
+
     /**
     @notice Gets active ballots' ids
     @return { "value" : "Array of active ballots ids" }
@@ -64,7 +66,7 @@ contract BallotsStorage is Owned {
     function getBallots() public view returns (uint[] value) {
         return ballots;
     }
-    
+
     /**
     @notice Gets ballot's memo
     @param ballotID Ballot unique ID
@@ -73,7 +75,7 @@ contract BallotsStorage is Owned {
     function getBallotMemo(uint ballotID) public view returns (string value) {
         return ballotsMapping[ballotID].memo;
     }
-    
+
     /**
     @notice Gets ballot's action
     @param ballotID Ballot unique ID
@@ -82,13 +84,15 @@ contract BallotsStorage is Owned {
     function getBallotAction(uint ballotID) public view returns (bool value) {
         return ballotsMapping[ballotID].addAction;
     }
-    
+
     /**
     @notice Gets mining key of notary
     @param ballotID Ballot unique ID
     @return { "value" : "Notary's mining key" }
     */
-    function getBallotMiningKey(uint ballotID) public view returns (address value) {
+    function getBallotMiningKey(
+        uint ballotID
+    ) public view returns (address value) {
         return ballotsMapping[ballotID].miningKey;
     }
 
@@ -97,7 +101,9 @@ contract BallotsStorage is Owned {
     @param ballotID Ballot unique ID
     @return { "value" : "Ballot's affected key" }
     */
-    function getBallotAffectedKey(uint ballotID) public view returns (address value) {
+    function getBallotAffectedKey(
+        uint ballotID
+    ) public view returns (address value) {
         return ballotsMapping[ballotID].affectedKey;
     }
 
@@ -106,7 +112,9 @@ contract BallotsStorage is Owned {
     @param ballotID Ballot unique ID
     @return { "value" : "Ballot's affected key type" }
     */
-    function getBallotAffectedKeyType(uint ballotID) public view returns (uint value) {
+    function getBallotAffectedKeyType(
+        uint ballotID
+    ) public view returns (uint value) {
         return ballotsMapping[ballotID].affectedKeyType;
     }
 
@@ -117,10 +125,12 @@ contract BallotsStorage is Owned {
     */
     function getBallotOwner(uint ballotID) public view returns (address value) {
         address ballotOwnerVotingKey = ballotsMapping[ballotID].owner;
-        address ballotOwnerMiningKey = keysStorage.votingMiningKeysPair(ballotOwnerVotingKey);
+        address ballotOwnerMiningKey = keysStorage.votingMiningKeysPair(
+            ballotOwnerVotingKey
+        );
         return ballotOwnerMiningKey;
     }
-    
+
     /**
     @notice Gets ballot's creation time
     @param ballotID Ballot unique ID
@@ -129,43 +139,51 @@ contract BallotsStorage is Owned {
     function ballotCreatedAt(uint ballotID) public view returns (uint value) {
         return ballotsMapping[ballotID].createdAt;
     }
-    
+
     /**
     @notice Gets ballot's voting start date
     @param ballotID Ballot unique ID
     @return { "value" : "Ballot's voting start date" }
     */
-    function getBallotVotingStart(uint ballotID) public view returns (uint value) {
+    function getBallotVotingStart(
+        uint ballotID
+    ) public view returns (uint value) {
         return ballotsMapping[ballotID].votingStart;
     }
-    
+
     /**
     @notice Gets ballot's voting end date
     @param ballotID Ballot unique ID
     @return { "value" : "Ballot's voting end date" }
     */
-    function getBallotVotingEnd(uint ballotID) public view returns (uint value) {
+    function getBallotVotingEnd(
+        uint ballotID
+    ) public view returns (uint value) {
         return ballotsMapping[ballotID].votingDeadline;
     }
-    
+
     /**
     @notice Gets ballot's amount of votes for
     @param ballotID Ballot unique ID
     @return { "value" : "Ballot's amount of votes for" }
     */
     function getVotesFor(uint ballotID) public view returns (int value) {
-        return (ballotsMapping[ballotID].votesAmmount + ballotsMapping[ballotID].result)/2;
+        return
+            (ballotsMapping[ballotID].votesAmmount +
+                ballotsMapping[ballotID].result) / 2;
     }
-    
+
     /**
     @notice Gets ballot's amount of votes against
     @param ballotID Ballot unique ID
     @return { "value" : "Ballot's amount of votes against" }
     */
     function getVotesAgainst(uint ballotID) public view returns (int value) {
-        return (ballotsMapping[ballotID].votesAmmount - ballotsMapping[ballotID].result)/2;
+        return
+            (ballotsMapping[ballotID].votesAmmount -
+                ballotsMapping[ballotID].result) / 2;
     }
-    
+
     /**
     @notice Checks, if ballot is active
     @param ballotID Ballot unique ID
@@ -183,7 +201,7 @@ contract BallotsStorage is Owned {
     function ballotIsVoted(uint ballotID) public view returns (bool value) {
         return ballotsMapping[ballotID].voted[msg.sender];
     }
-    
+
     /**
     @notice Votes
     @param ballotID Ballot unique ID
@@ -191,7 +209,7 @@ contract BallotsStorage is Owned {
     */
     function vote(uint ballotID, bool accept) public {
         assert(keysStorage.checkVotingKeyValidity(msg.sender));
-        Ballot storage v =  ballotsMapping[ballotID];
+        Ballot storage v = ballotsMapping[ballotID];
         assert(v.votingDeadline >= now);
         assert(!v.voted[msg.sender]);
         v.voted[msg.sender] = true;
@@ -203,15 +221,24 @@ contract BallotsStorage is Owned {
         }
     }
 
-    function finalizeBallotInternal(uint ballotID) public returns(bool finalized) {
+    function finalizeBallotInternal(
+        uint ballotID
+    ) public returns (bool finalized) {
         require(msg.sender == address(ballotsManager));
         Ballot storage b = ballotsMapping[ballotID];
         if (b.votingDeadline < now && b.active) {
-            if ((int(b.votesAmmount) >= int(ballotsManager.votingLowerLimit())) && b.result > 0) {
-                if (b.addAction) { //add key
+            if (
+                (int(b.votesAmmount) >=
+                    int(ballotsManager.votingLowerLimit())) && b.result > 0
+            ) {
+                if (b.addAction) {
+                    //add key
                     ballotsManager.checkBallotsActivityPostActionAdd(ballotID);
-                } else { //invalidate key
-                    ballotsManager.checkBallotsActivityPostActionRemove(ballotID);
+                } else {
+                    //invalidate key
+                    ballotsManager.checkBallotsActivityPostActionRemove(
+                        ballotID
+                    );
                 }
             }
             b.active = false;
@@ -237,7 +264,7 @@ contract BallotsStorage is Owned {
             owner: owner,
             miningKey: miningKey,
             affectedKey: affectedKey,
-            memo: memo, 
+            memo: memo,
             affectedKeyType: affectedKeyType,
             createdAt: now,
             votingStart: votingStart,

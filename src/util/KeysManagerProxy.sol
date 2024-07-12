@@ -1,7 +1,7 @@
-pragma solidity 0.4.18;
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.18;
 
 import "./../KeysManager.sol";
-
 
 contract KeysManagerProxy is KeysManager {
     function KeysManagerProxy() public KeysManager() {

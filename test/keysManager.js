@@ -1,18 +1,18 @@
 require('chai')
-  .use(require('chai-as-promised'))
-  .use(require('chai-bignumber')(web3.BigNumber))
-  .should();
+    .use(require('chai-as-promised'))
+    .use(require('chai-bignumber')(web3.BigNumber))
+    .should();
 let data = require('./data.js');
 let big = require('./util/bigNum.js').big;
-let {addressFromNumber} = require('./util/ether.js');
+let { addressFromNumber } = require('./util/ether.js');
 
-let {deployTestContracts} = require('./util/deploy.js');
+let { deployTestContracts } = require('./util/deploy.js');
 
-contract('keysManager', function(accounts) {
-    let {systemOwner, keysManager} = {};
+contract('keysManager', function (accounts) {
+    let { systemOwner, keysManager } = {};
 
     beforeEach(async () => {
-        ({systemOwner, keysManager}  = await deployTestContracts());
+        ({ systemOwner, keysManager } = await deployTestContracts());
     });
 
     it('initialKeysLimit', async () => {
@@ -26,10 +26,10 @@ contract('keysManager', function(accounts) {
             await keysManager.licensesLimit()
         );
 
-    it('getLicensesLimitFromGovernance', async () => {
-        (data.LICENSES_LIMIT - data.INITIAL_KEYS_LIMIT).should.be.bignumber.equal(
-            await keysManager.getLicensesLimitFromGovernance()
-        );
-    });
+        it('getLicensesLimitFromGovernance', async () => {
+            (data.LICENSES_LIMIT - data.INITIAL_KEYS_LIMIT).should.be.bignumber.equal(
+                await keysManager.getLicensesLimitFromGovernance()
+            );
+        });
     });
 });

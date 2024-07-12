@@ -1,96 +1,70 @@
-# Oracles POA Network smart contracts
-Ethereum smart contracts to manage validators in Oracles POA Network 
+```markdown
+# Oracles POA Network Smart Contracts
 
-- [Oracles POA Network smart contracts](#oracles-poa-network-smart-contracts)
-  * [Oracles POA Network contracts features checklist](#oracles-poa-network-contracts-features-checklist)
-    + [ValidatorsStorage and ValidatorsManager contracts](#validatorsstorage-and-validatorsmanager-contracts)
-    + [KeysStorage and KeysManager contracts](#keysstorage-and-keysmanager-contracts)
-    + [BallotsStorage and BallotsManager contracts](#ballotsstorage-and-ballotsmanager-contracts)
-  * [Known Ethereum contracts attack vectors checklist](#known-ethereum-contracts-attack-vectors-checklist)
-  * [Compiling of Oracles contract](#compiling-of-oracles-contract)
-  * [How to run tests](#how-to-run-tests)
+Ethereum smart contracts to manage validators in Oracles POA Network.
 
-## Oracles POA Network contracts features checklist
+## Features Checklist
 
-### [ValidatorsStorage](https://github.com/oraclesorg/oracles-contract/blob/master/src/ValidatorsStorage.sol) and [ValidatorsManager](https://github.com/oraclesorg/oracles-contract/blob/master/src/ValidatorsManager.sol) contracts.
+### ValidatorsStorage and ValidatorsManager Contracts
 
-These are contracts for storing and managing the data for validators.
+These contracts are used for storing and managing validator data.
 
-| № | Description                                             | Status |
-|---|:-----------------------------------------------------|:--------------------------:|
-| 1 | Validator's personal data addition is available for valid initial key from ceremony     | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
-| 2 | Validator's personal data addition is forbidden for invalid initial key from ceremony    | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
-| 3 | Validator's personal data addition is forbidden for the same valid initial key from ceremony twice    | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
-| 4 | Validator's personal data addition is forbidden from ceremony, if counter of initial keys, invalidated from ceremony, reached the limit    | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
-| 5 | Validator's personal data addition is available for valid voting key from governance     | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
-| 6 | Validator's personal data addition is forbidden for invalid voting key from governance    | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
-| 7 | Validator's personal data addition is forbidden for the same valid voting key from governance twice    | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
-| 8 | Validator's personal data addition is forbidden from governance, if counter of validators, added from governance, reached the limit    | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
-| 9 | Mining key is added to validators' array after generation of new production keys   | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
-| 10 | Personal data: output zip code is equal to input zip code and it is a bignumber   | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
-| 11 | Personal data: output licenseExpiredAt is equal to input licenseExpiredAt and it is a bignumber   | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
-| 12 | Personal data: output licenseID is equal to input licenseID   | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
-| 13 | Personal data: output fullname is equal to input fullname   | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
-| 14 | Personal data: output streetname is equal to input streetname   | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
-| 15 | Personal data: output state is equal to input state   | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
-| 16 | Personal data: output sisablingDate is empty   | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
+- Validator's personal data can be added for valid initial keys from the ceremony.
+- Validator's personal data addition is restricted for invalid initial keys from the ceremony.
+- Duplicate validator data addition using the same initial key is prevented.
+- Validator data addition is restricted if the invalid initial keys counter reaches its limit.
+- Validator data can be added using a valid voting key from governance.
+- Validator data addition is restricted for invalid voting keys from governance.
+- Duplicate validator data addition using the same valid voting key is prevented.
+- Validator data addition is restricted if the governance validators counter reaches its limit.
+- Mining keys are added to the validators' array after new production keys are generated.
+- Validator personal data fields (zip code, license expiry date, license ID, full name, street name, state) are correctly outputted as expected.
 
-### [KeysStorage](https://github.com/oraclesorg/oracles-contract/blob/master/src/KeysStorage.sol) and [KeysManager](https://github.com/oraclesorg/oracles-contract/blob/master/src/KeysManager.sol) contracts.
+### KeysStorage and KeysManager Contracts
 
-These are contracts for storing and managing the data for [Oracles POA Network Keys Generation dApp](https://github.com/oraclesorg/oracles-dapps-keys-generation).
+These contracts are for storing and managing data for the Oracles POA Network Keys Generation dApp.
 
-| № | Description                                             | Status |
-|---|:-----------------------------------------------------|:--------------------------:|
-| 1 | Initial key addition is available for contract owner     | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
-| 2 | Initial key addition fails to add same key twice    | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
-| 3 | Initial key is valid after execution of `addInitialKey` function     | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
-| 4 | Initial key generation is forbidden for non-owner of contract    | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
-| 5 | It is allowed to add only limited number of initial keys (25)     | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
-| 6 | Production keys generation fails for invalid initial key     | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
-| 7 | Production keys generation fails for used initial key     | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
-| 8 | Licenses counter is incremented by generation of production keys     | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
-| 9 | Initial keys invalidation counter is incremented by generation of production keys     | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
-| 10 | Mining, voting and payout keys are generated after execution `createKeys`  function, and they are valid     | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
-| 11 | Initial key is invalidated immediately after mining/payout/voting keys are created     | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
+- Initial keys can be added by the contract owner.
+- Duplicate initial keys cannot be added.
+- Initial keys are valid after using the `addInitialKey` function.
+- Non-owners cannot generate initial keys.
+- A limited number of initial keys (25) can be added.
+- Production keys generation fails for invalid or already used initial keys.
+- Licenses counter and initial keys invalidation counter are incremented when production keys are generated.
+- Mining, voting, and payout keys are generated and validated after executing the `createKeys` function.
+- Initial keys are invalidated immediately after mining, voting, and payout keys are created.
 
-### [BallotsStorage](https://github.com/oraclesorg/oracles-contract/blob/master/src/BallotsStorage.sol) and [BallotsManager](https://github.com/oraclesorg/oracles-contract/blob/master/src/BallotsManager.sol) contracts.
+### BallotsStorage and BallotsManager Contracts
 
-These are contracts for storing and managing the data for [Oracles POA Network Governance dApp](https://github.com/oraclesorg/oracles-dapps-voting).
+These contracts are for storing and managing data for the Oracles POA Network Governance dApp. (To be completed...)
 
-To be done...
+## Known Ethereum Contracts Attack Vectors Checklist
 
-## Known Ethereum contracts attack vectors checklist
+- **Race Conditions:** Order of transactions within a block can be manipulated.
+  - **Reentrancy:** Functions can be called repeatedly before the first invocation finishes.
+  - **Cross-function Race Conditions:** Similar attacks using two different functions sharing the same state.
+  - **Pitfalls in Race Condition Solutions:** Avoid calling functions that invoke external functions.
+- **Timestamp Dependence:** Block timestamp can be manipulated by the miner.
+- **Integer Overflow and Underflow:** Usage of unlimited increments can cause issues.
+- **DoS with (Unexpected) Throw:** Unexpected throw can occur due to malicious users.
+- **DoS with Block Gas Limit:** Block gas limit can be reached, e.g., by looping through a large array and sending `send()` in a single transaction.
 
-| № | Attack vector                  | Description                                                        | Status |
-|---|:-----------------------------------------------------|:-----------------------------------------------------|:--------------------------:|
-| 1 | [Race Conditions](https://github.com/ConsenSys/smart-contract-best-practices#race-conditions)     | The order of transactions themselves (within a block) is easily subject to manipulation | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
-| 1.a | [Reentrancy](https://github.com/ConsenSys/smart-contract-best-practices#reentrancy)     | Functions can be called repeatedly, before the first invocation of the function was finished | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
-| 1.b | [Cross-function Race Conditions](https://github.com/ConsenSys/smart-contract-best-practices#cross-function-race-conditions)     | A similar attack using two different functions that share the same state | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
-| 1.c | [Pitfalls in Race Condition Solutions](https://github.com/ConsenSys/smart-contract-best-practices#cross-function-race-conditions)     | Avoiding of calling functions which call external functions | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
-| 2 | [Timestamp Dependence](https://github.com/ConsenSys/smart-contract-best-practices#timestamp-dependence)     | Timestamp of the block can be manipulated by the miner | |
-| 3 | [Integer Overflow and Underflow](https://github.com/ConsenSys/smart-contract-best-practices#integer-overflow-and-underflow)     | Usage of unlimited increments can cause such issue  | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
-| 4 | [DoS with (Unexpected) Throw](https://github.com/ConsenSys/smart-contract-best-practices#dos-with-unexpected-throw)     | Unexpected throw is reached with some contract method for any user, because of malicious user called it before with bad parameters | ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
-| 5 | [DoS with Block Gas Limit](https://github.com/ConsenSys/smart-contract-best-practices#dos-with-block-gas-limit)     |  Block gas limit can be reached, for example, with looping through an array with unknown size and sending `send()` in a single transaction. Sending should be divided to multiple transactions| ![good](https://cdn.rawgit.com/primer/octicons/62c672732695b6429678bcd321520c41af109475/build/svg/check.svg) |
+## Compiling Oracles Contract
 
-## Compiling of Oracles contract
-Install [dapp cli](http://dapp.readthedocs.io/en/latest/installation.html#installing-dapp)
+1. Install [dapp cli](http://dapp.readthedocs.io/en/latest/installation.html#installing-dapp)
+2. Clone the repository: `git clone https://github.com/oraclesorg/oracles-contract`
+3. Navigate to the project folder: `cd oracles-contract/`
+4. Get submodule data: `git submodule update --init --recursive`
+5. Compile the contracts: `dapp build`
 
-1) `git clone https://github.com/oraclesorg/oracles-contract` // clone repository
+Expected output:
+- `./out/Oracles.bin` - Bytecode of Oracles contract
+- `./out/Oracles.abi` - Binary interface of Oracles contract
 
-2) `cd oracles-contract/` // move to folder with project
+## Running Tests
 
-3) `git submodule update --init --recursive` // get submodules data
+1. Start `testrpc` with specific accounts and balances using `make testrpc`.
+2. Run tests with `truffle test`.
+```
 
-4) `dapp build` // compiling of contracts to `./out`
-
-Expected result: 
-
-`./out/Oracles.bin` - bytecode of Oracles contract
-
-`./out/Oracles.abi` - binary interface of Oracles contract
-
-
-## How to run tests
-
-* Start testrpc process with specific accounts and balances. Use `make testrpc` command.
-* Run tests with command `truffle test`.
+This `README.md` file is structured to provide clear and concise information about your project, its features, known issues, and instructions for compilation and testing.

@@ -1,16 +1,16 @@
 require('chai')
-  .use(require('chai-as-promised'))
-  .use(require('chai-bignumber')(web3.BigNumber))
-  .should();
+    .use(require('chai-as-promised'))
+    .use(require('chai-bignumber')(web3.BigNumber))
+    .should();
 let data = require('./data.js');
 let big = require('./util/bigNum.js').big;
-let {addressFromNumber} = require('./util/ether.js');
+let { addressFromNumber } = require('./util/ether.js');
 let util = require('util');
 
-let {deployTestContracts} = require('./util/deploy.js');
+let { deployTestContracts } = require('./util/deploy.js');
 
-contract('ValidatorsStorage', function(accounts) {
-    let {systemOwner, keysStorage, validatorsStorage, validatorsManager} = {};
+contract('ValidatorsStorage', function (accounts) {
+    let { systemOwner, keysStorage, validatorsStorage, validatorsManager } = {};
     let keys1 = {
         mining: accounts[1],
         payout: accounts[2],
@@ -39,21 +39,21 @@ contract('ValidatorsStorage', function(accounts) {
     };
 
     beforeEach(async () => {
-        ({systemOwner, keysStorage, validatorsStorage, validatorsManager}  = await deployTestContracts());
+        ({ systemOwner, keysStorage, validatorsStorage, validatorsManager } = await deployTestContracts());
     });
 
     it('getValidators', async () => {
-        await keysStorage.addInitialKey(accounts[0], {from: systemOwner});
-        await keysStorage.createKeys(keys1.mining, keys1.payout, keys1.voting, {from: accounts[0]});
-        await keysStorage.addInitialKey(accounts[4], {from: systemOwner});
-        await keysStorage.createKeys(keys2.mining, keys2.payout, keys2.voting, {from: accounts[4]});
+        await keysStorage.addInitialKey(accounts[0], { from: systemOwner });
+        await keysStorage.createKeys(keys1.mining, keys1.payout, keys1.voting, { from: accounts[0] });
+        await keysStorage.addInitialKey(accounts[4], { from: systemOwner });
+        await keysStorage.createKeys(keys2.mining, keys2.payout, keys2.voting, { from: accounts[4] });
         [systemOwner.toLowerCase(), keys1.mining, keys2.mining].should.be.deep.equal(
             await validatorsStorage.getValidators()
         );
     });
 
     it('upsertValidatorFromGovernance [update own data with voting key]', async () => {
-        await keysStorage.addInitialKey(accounts[0], {from: systemOwner});
+        await keysStorage.addInitialKey(accounts[0], { from: systemOwner });
         await validatorsManager.insertValidatorFromCeremony(
             keys1.mining,
             data1.zip,
@@ -62,9 +62,9 @@ contract('ValidatorsStorage', function(accounts) {
             data1.fullName,
             data1.streetName,
             data1.state,
-            {from: accounts[0]}
+            { from: accounts[0] }
         );
-        await keysStorage.createKeys(keys1.mining, keys1.payout, keys1.voting, {from: accounts[0]});
+        await keysStorage.createKeys(keys1.mining, keys1.payout, keys1.voting, { from: accounts[0] });
         await validatorsManager.upsertValidatorFromGovernance(
             keys1.mining,
             data1.zip,
@@ -73,7 +73,7 @@ contract('ValidatorsStorage', function(accounts) {
             data1.fullName,
             'NEW STREET',
             data1.state,
-            {from: keys1.voting}
+            { from: keys1.voting }
         );
         [
             data1.fullName, 'NEW STREET', data1.state, big(data1.zip),
@@ -85,7 +85,7 @@ contract('ValidatorsStorage', function(accounts) {
     });
 
     it('getValidator* methods', async () => {
-        await keysStorage.addInitialKey(accounts[0], {from: systemOwner});
+        await keysStorage.addInitialKey(accounts[0], { from: systemOwner });
         await validatorsManager.insertValidatorFromCeremony(
             keys1.mining,
             data1.zip,
@@ -94,7 +94,7 @@ contract('ValidatorsStorage', function(accounts) {
             data1.fullName,
             data1.streetName,
             data1.state,
-            {from: accounts[0]}
+            { from: accounts[0] }
         );
         data1.zip.should.be.bignumber.equal(
             await validatorsStorage.getValidatorZip.call(keys1.mining)

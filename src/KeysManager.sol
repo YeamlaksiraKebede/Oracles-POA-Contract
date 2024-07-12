@@ -1,10 +1,11 @@
-pragma solidity 0.4.18;
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.18;
 
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "./Owned.sol";
 
 contract KeysManager is Owned {
-	using SafeMath for uint256;
+    using SafeMath for uint256;
 
     // Max allowed number of initial keys
     int8 public initialKeysLimit = 12;
@@ -12,8 +13,10 @@ contract KeysManager is Owned {
     int8 public licensesLimit = 52;
 
     // Number of licenses allowed to issue by governance
-    function getLicensesLimitFromGovernance() public view
-        returns(uint licensesLimitFromGovernance)
+    function getLicensesLimitFromGovernance()
+        public
+        view
+        returns (uint licensesLimitFromGovernance)
     {
         return SafeMath.sub(uint(licensesLimit), uint(initialKeysLimit));
     }

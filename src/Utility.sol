@@ -1,5 +1,5 @@
-pragma solidity 0.4.18;
-
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.18;
 
 contract Utility {
     function getLastBlockHash() public view returns (bytes32) {
@@ -11,7 +11,7 @@ contract Utility {
     function toString(address x) public pure returns (string) {
         bytes memory b = new bytes(20);
         for (uint i = 0; i < 20; i++)
-            b[i] = byte(uint8(uint(x) / (2**(8*(19 - i)))));
+            b[i] = bytes1(uint8(uint(x) / (2 ** (8 * (19 - i)))));
         return string(b);
     }
 }

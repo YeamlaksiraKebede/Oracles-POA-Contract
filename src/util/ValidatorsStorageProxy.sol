@@ -1,8 +1,8 @@
-pragma solidity 0.4.18;
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.18;
 
 import "./../Utility.sol";
 import "./../ValidatorsStorage.sol";
-
 
 contract ValidatorsStorageProxy is ValidatorsStorage {
     function ValidatorsStorageProxy() public ValidatorsStorage() {
@@ -16,5 +16,4 @@ contract ValidatorsStorageProxy is ValidatorsStorage {
         validators.push(owner);
         InitiateChange(Utility.getLastBlockHash(), validators);
     }
-
 }

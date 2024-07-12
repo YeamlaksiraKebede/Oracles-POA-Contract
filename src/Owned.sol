@@ -1,5 +1,5 @@
-pragma solidity 0.4.18;
-
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.18;
 
 contract Owned {
     address public owner;
@@ -8,7 +8,7 @@ contract Owned {
         owner = 0xDd0BB0e2a1594240fED0c2f2c17C1E9AB4F87126; //msg.sender
     }
 
-    modifier onlyOwner {
+    modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }

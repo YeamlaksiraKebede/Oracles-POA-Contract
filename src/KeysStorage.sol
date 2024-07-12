@@ -1,4 +1,5 @@
-pragma solidity 0.4.18;
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.18;
 
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "./Owned.sol";
@@ -13,15 +14,15 @@ contract KeysStorage is Owned {
     int8 public initialKeysIssued = 0;
     int8 public initialKeysInvalidated = 0;
     int8 public licensesIssued = 0;
-    
+
     struct InitialKey {
         bool isNew;
     }
-   
+
     struct MiningKey {
         bool isActive;
     }
-    
+
     struct PayoutKey {
         bool isActive;
     }
@@ -34,7 +35,7 @@ contract KeysStorage is Owned {
         address votingKey;
         address payoutKey;
     }
-    
+
     mapping(address => MiningKey) public miningKeys;
     mapping(address => PayoutKey) public payoutKeys;
     mapping(address => VotingKey) public votingKeys;
@@ -46,7 +47,7 @@ contract KeysStorage is Owned {
     BallotsManager public ballotsManager;
     ValidatorsStorage public validatorsStorage;
     ValidatorsManager public validatorsManager;
-    
+
     function initialize(
         address keysManagerAddr,
         address ballotsManagerAddr,
@@ -94,7 +95,7 @@ contract KeysStorage is Owned {
         initialKeysIssued++;
         initialKeys[key] = InitialKey({isNew: true});
     }
-    
+
     /**
     @notice Create production keys for notary
     @param miningAddr Mining key
@@ -102,8 +103,8 @@ contract KeysStorage is Owned {
     @param votingAddr Voting key
     */
     function createKeys(
-        address miningAddr, 
-        address payoutAddr, 
+        address miningAddr,
+        address payoutAddr,
         address votingAddr
     ) public {
         assert(checkInitialKey(msg.sender));
@@ -117,7 +118,10 @@ contract KeysStorage is Owned {
         //add mining key to list of validators
         validatorsStorage.addValidator(miningAddr);
         votingMiningKeysPair[votingAddr] = miningAddr;
-        miningToSecondaryKeys[miningAddr] = SecondaryKeys({votingKey: votingAddr, payoutKey: payoutAddr});
+        miningToSecondaryKeys[miningAddr] = SecondaryKeys({
+            votingKey: votingAddr,
+            payoutKey: payoutAddr
+        });
     }
 
     /**
@@ -134,25 +138,31 @@ contract KeysStorage is Owned {
     @param addr Mining key
     @return { "value" : "Is mining key active or not active" }
     */
-    function checkMiningKeyValidity(address addr) public view returns (bool value) {
+    function checkMiningKeyValidity(
+        address addr
+    ) public view returns (bool value) {
         return miningKeys[addr].isActive;
     }
-    
+
     /**
     @notice Checks, if payout key is active or not
     @param addr Payout key
     @return { "value" : "Is payout key active or not active" }
     */
-    function checkPayoutKeyValidity(address addr) public view returns (bool value) {
+    function checkPayoutKeyValidity(
+        address addr
+    ) public view returns (bool value) {
         return payoutKeys[addr].isActive;
     }
-    
+
     /**
     @notice Checks, if voting key is active or not
     @param addr Voting key
     @return { "value" : "Is voting key active or not active" }
     */
-    function checkVotingKeyValidity(address addr) public view returns (bool value) {
+    function checkVotingKeyValidity(
+        address addr
+    ) public view returns (bool value) {
         return votingKeys[addr].isActive;
     }
 
@@ -171,34 +181,59 @@ contract KeysStorage is Owned {
         payoutKeys[_payoutKey] = PayoutKey({isActive: _isActive});
     }
 
-    function setMiningPayoutKeysPair(address miningKey, address payoutKey) public {
+    function setMiningPayoutKeysPair(
+        address miningKey,
+        address payoutKey
+    ) public {
         require(msg.sender == address(ballotsManager));
-        miningToSecondaryKeys[miningKey] = SecondaryKeys({votingKey: miningToSecondaryKeys[miningKey].votingKey, payoutKey: payoutKey});
+        miningToSecondaryKeys[miningKey] = SecondaryKeys({
+            votingKey: miningToSecondaryKeys[miningKey].votingKey,
+            payoutKey: payoutKey
+        });
     }
 
-    function setMiningVotingKeysPair(address miningKey, address votingKey) public {
+    function setMiningVotingKeysPair(
+        address miningKey,
+        address votingKey
+    ) public {
         require(msg.sender == address(ballotsManager));
-        miningToSecondaryKeys[miningKey] = SecondaryKeys({votingKey: votingKey, payoutKey: miningToSecondaryKeys[miningKey].payoutKey});
+        miningToSecondaryKeys[miningKey] = SecondaryKeys({
+            votingKey: votingKey,
+            payoutKey: miningToSecondaryKeys[miningKey].payoutKey
+        });
     }
 
-    function getVotingByMining(address miningKey) public view returns (address votingKey) {
+    function getVotingByMining(
+        address miningKey
+    ) public view returns (address votingKey) {
         return miningToSecondaryKeys[miningKey].votingKey;
     }
 
-    function getPayoutByMining(address miningKey) public view returns (address payoutKey) {
+    function getPayoutByMining(
+        address miningKey
+    ) public view returns (address payoutKey) {
         return miningToSecondaryKeys[miningKey].payoutKey;
     }
 
-    function setVotingMiningKeysPair(address votingKey, address miningKey) public {
+    function setVotingMiningKeysPair(
+        address votingKey,
+        address miningKey
+    ) public {
         require(msg.sender == address(ballotsManager));
         votingMiningKeysPair[votingKey] = miningKey;
     }
 
-    function getMiningByVoting(address votingKey) public view returns (address miningKey) {
+    function getMiningByVoting(
+        address votingKey
+    ) public view returns (address miningKey) {
         return votingMiningKeysPair[votingKey];
     }
 
-    function getLicensesIssuedFromGovernance() public view returns (uint licensesIssuedFromGovernance) {
+    function getLicensesIssuedFromGovernance()
+        public
+        view
+        returns (uint licensesIssuedFromGovernance)
+    {
         return SafeMath.sub(uint(licensesIssued), uint(initialKeysInvalidated));
     }
 }
